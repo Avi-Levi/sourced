@@ -19,7 +19,7 @@ object Serializer {
   def toEventObject(doc:BSONDocument) : EventObject = {
     def deserializeDocument(className:String, body:BSONDocument) : AnyRef = {
       val metadata = getMetadata(className)
-      val instance = metadata.newInstance
+      val instance = newInstance(metadata)
       body.elements.foreach{elem=>
         metadata.fields.get(elem._1).map(f=>{
           val value = if(!elem._2.isInstanceOf[BSONDocument]) {
@@ -32,6 +32,20 @@ object Serializer {
         })
       }
       instance
+    }
+    def newInstance(metadata:ClassMetadata) = {
+      try{
+        val params = metadata.ctor.getParameterTypes.map{cls=>
+          valueHandlers.get(cls) match {
+            case Some(valueHandler) => valueHandler.defaultValue.asInstanceOf[AnyRef]
+            case None => null
+          }
+        }
+
+        metadata.ctor.newInstance(params.toSeq :_*).asInstanceOf[AnyRef]
+      }catch {
+        case t: Throwable => throw new CreateObjectInstanceException(metadata.cls,t)
+      }
     }
     
     EventObject(

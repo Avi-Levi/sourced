@@ -23,6 +23,7 @@
     	<encoding>UTF-8</encoding>
     	<scala.tools.version>2.15.2</scala.tools.version>
    		<scala.version>2.10.4</scala.version>
+        <pickling.version>0.9.1</pickling.version>
   	</properties>
 
   	<dependencies>
@@ -31,7 +32,6 @@
 		  <artifactId>scala-library</artifactId>
 		  <version>${scala.version}</version>
       </dependency>
-
       <dependency>
           <groupId>org.scalatest</groupId>
           <artifactId>scalatest_2.10</artifactId>
@@ -45,7 +45,7 @@
           <scope>test</scope>
       </dependency>
 	</dependencies>
-	    <pluginRepositories>
+    <pluginRepositories>
         <pluginRepository>
             <id>scala-tools.org</id>
             <name>Scala-Tools Maven2 Repository</name>
@@ -56,6 +56,12 @@
 		<repository>
 			<id>Typesafe repository releases</id>
             <url>http://repo.typesafe.com/typesafe/releases/</url>
+        </repository>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
         </repository>
     </repositories>
 </project>

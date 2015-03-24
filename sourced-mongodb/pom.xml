@@ -31,7 +31,11 @@
           <version>0.10.5.0.akka23</version>
       </dependency>
 
-
+<!--      <dependency>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-pickling_2.10</artifactId>
+          <version>${pickling.version}</version>
+      </dependency>-->
   </dependencies>
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>

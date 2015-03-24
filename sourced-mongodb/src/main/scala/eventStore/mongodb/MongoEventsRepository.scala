@@ -13,9 +13,8 @@ import scala.util.{Failure, Success, Try}
 
 class MongoEventsRepository(private val config: MongoConfig) extends EventsRepository{
 
-  /*implicit val handler = Macros.handler[EventObject]*/
-
   val collection = connect(config)
+
   override def iterate(streamId: String, handleEvent: (EventObject) => Unit): Future[Long] = {
     val p = promise[Long]()
 

@@ -30,7 +30,7 @@ class DefaultEventStream(private val streamKey: StreamKey,
     def onStateLoaded(s: Try[Unit] with Success[Any]) = {
       events.foreach(this.pushSync)
       if (!this.newEvents.isEmpty) {
-        val saveFuture = this.eventsRepository.save(this.newEvents)
+        val saveFuture = this.eventsRepository.save(this.streamKey.id, this.newEvents)
         saveFuture onSuccess {
           case _ => newEvents.clear
         }

@@ -7,7 +7,7 @@ import reactivemongo.bson.{BSONDocument, _}
 
 import scala.collection._
 
-object Serializer {
+object EventsSerializer {
   val valueHandlers = Map[Class[_], ValueHandler](
     classOf[String] -> ValueHandler("", v => v.asInstanceOf[BSONString].value, v=>BSONString(v.asInstanceOf[String])),
     classOf[Long] -> ValueHandler(0L, v => v.asInstanceOf[BSONLong].value, v=>BSONLong(v.asInstanceOf[Long])),

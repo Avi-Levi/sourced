@@ -13,7 +13,7 @@ class TestEventsRepository(events:List[EventObject]) extends EventsRepository{
     promise[Long]().complete(Success(events.size)).future
   }
 
-  override def save(events: Iterable[EventObject]): Future[Try[Unit]] = {
+  override def save(streamId:String, events: Iterable[EventObject]): Future[Try[Unit]] = {
     this.newEvents = events.toArray
     Future.successful(Success())
   }

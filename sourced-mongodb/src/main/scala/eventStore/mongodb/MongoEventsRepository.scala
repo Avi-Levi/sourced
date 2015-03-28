@@ -1,6 +1,6 @@
 package eventStore.mongodb
 
-import eventStore.mongodb.serialization.Serializer
+import eventStore.mongodb.serialization.EventsSerializer
 import eventstore.events.{EventObject, EventsRepository}
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import reactivemongo.api._
@@ -26,7 +26,7 @@ class MongoEventsRepository(private val config: MongoConfig) extends EventsRepos
       .cursor[BSONDocument]
       .enumerate().apply(Iteratee.foreach{doc =>
         count += 1
-        handleEvent(Serializer.toEventObject(doc))
+        handleEvent(EventsSerializer.toEventObject(doc))
       })
       .onComplete{
       case Success(x) => p.success(count)
@@ -36,8 +36,15 @@ class MongoEventsRepository(private val config: MongoConfig) extends EventsRepos
     p.future
   }
 
-  override def save(events: Iterable[EventObject]): Future[Try[Unit]] = {
-    collection.bulkInsert(Enumerator.enumerate(events.map(Serializer.toDocument))).transform(x=>null, t=>t)
+  override def save(streamId:String, events: Iterable[EventObject]): Future[Try[Unit]] = {
+    import BSONDocumentExtensions._
+
+    val p = promise[Try[Unit]]()
+    collection.bulkInsert(Enumerator.enumerate(events.map(EventsSerializer.toDocument(_).setStreamId(streamId)))) onComplete{
+      case Success(x)=> p.success(Success(Unit))
+      case Failure(t)=> p.failure(t)
+    }
+    p.future
   }
 
   private def connect(config: MongoConfig) : BSONCollection = {

@@ -12,8 +12,11 @@
 	<description>event sourcing library</description>
 	
 	<modules>
-        <module>sourced-core</module>
+        <module>sourced-backend</module>
+        <module>sourced-client-api</module>
+        <module>sourced-handlers-api</module>
         <module>sourced-mongodb</module>
+        <module>sourced-embedded</module>
 	</modules>
 
 	<properties>

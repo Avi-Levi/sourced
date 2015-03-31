@@ -1,12 +1,12 @@
 import java.util.concurrent.TimeUnit
 
 import eventStore.mongodb.{MongoConfig, MongoEventsStorage}
-import sourced.events.EventObject
 import org.scalatest.FunSuite
+import sourced.backend.events.EventObject
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 class MongoEventsRepositoryTests extends FunSuite{
   val streamId = "someId"

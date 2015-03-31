@@ -1,11 +1,11 @@
 package eventStore.mongodb
 
 import eventStore.mongodb.serialization.EventsSerializer
-import sourced.events._
 import play.api.libs.iteratee.{Enumerator, Iteratee}
 import reactivemongo.api._
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson.{BSONDocument, _}
+import sourced.backend.events.{EventsStorage, EventObject}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, _}

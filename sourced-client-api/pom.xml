@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>sourced-mongodb</artifactId>
-	<parent>
-		<groupId>org.sourced</groupId>
+  <artifactId>sourced-client-api</artifactId>
+  <version>0.0.1</version>
+   	<parent>
+ 		<groupId>org.sourced</groupId>
 		<artifactId>sourced</artifactId>
 		<version>0.0.1</version>
-	</parent>
-  <version>0.0.1</version>
+ 	</parent>
   <name>${project.artifactId}</name>
-  <description>sourced mongodb</description>
+  <description>event sourcing library</description>
   <inceptionYear>2015</inceptionYear>
   <licenses>
     <license>
@@ -19,22 +19,6 @@
   </licenses>
 
   <dependencies>
-      <dependency>
-          <groupId>org.sourced</groupId>
-          <artifactId>sourced-backend</artifactId>
-          <version>0.0.1</version>
-      </dependency>
-      <dependency>
-          <groupId>org.reactivemongo</groupId>
-          <artifactId>reactivemongo_2.10</artifactId>
-          <version>0.10.5.0.akka23</version>
-      </dependency>
-
-<!--      <dependency>
-          <groupId>org.scala-lang</groupId>
-          <artifactId>scala-pickling_2.10</artifactId>
-          <version>${pickling.version}</version>
-      </dependency>-->
   </dependencies>
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>
@@ -112,4 +96,6 @@
         </plugin>
     </plugins>
   </build>
+    <repositories>
+    </repositories>
 </project>

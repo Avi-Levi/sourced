@@ -2,8 +2,8 @@ package eventStore.mongodb.serialization
 
 import java.lang.reflect.Field
 
-import sourced.events.EventObject
 import reactivemongo.bson.{BSONDocument, _}
+import sourced.backend.events.EventObject
 
 import scala.collection._
 

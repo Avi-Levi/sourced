@@ -1,4 +1,4 @@
-import eventstore.metadata.DefaultHandlerMetadataBuilder
+import sourced.metadata.DefaultHandlerMetadataBuilder
 import org.scalatest.FunSuite
 import testsClasses.{TestEvent, TestHandler}
 

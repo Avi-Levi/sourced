@@ -1,4 +1,4 @@
-import eventstore.api.HandlersInstanceBuilder
+import sourced.api.HandlersInstanceBuilder
 import org.scalatest.FunSuite
 
 class HandlersInstanceBuilderTests extends FunSuite{

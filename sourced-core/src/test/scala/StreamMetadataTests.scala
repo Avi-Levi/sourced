@@ -1,4 +1,4 @@
-import eventstore.metadata.{HandlerMetadata, StreamMetadata}
+import sourced.metadata.{HandlerMetadata, StreamMetadata}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import testsClasses.{TestEvent2, TestHandler, TestEvent}
 

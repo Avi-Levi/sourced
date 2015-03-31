@@ -1,7 +1,7 @@
 package testsClasses
 
-import eventstore.WithStreamRef
-import eventstore.api.HandlerMethod
+import sourced.WithStreamRef
+import sourced.api.HandlerMethod
 
 class TestHandler extends WithStreamRef{
   var testEventDispatched = false

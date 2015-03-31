@@ -1,8 +1,8 @@
 import java.util.concurrent.TimeUnit
 
-import eventstore.metadata.{HandlerMetadata, StreamMetadata}
-import eventstore.stateLoader.{LoadStateResponse, StreamStateLoader}
-import eventstore.stream.{DefaultEventStream, StreamKey}
+import sourced.metadata.{HandlerMetadata, StreamMetadata}
+import sourced.stateLoader.{LoadStateResponse, StreamStateLoader}
+import sourced.stream.{DefaultEventStream, StreamKey}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import testsClasses.{TestEvent, TestEventDispatcher, TestEventsRepository, TestHandler}

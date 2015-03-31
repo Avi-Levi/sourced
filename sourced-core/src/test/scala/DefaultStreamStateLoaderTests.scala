@@ -1,9 +1,9 @@
 import java.util.concurrent.TimeUnit
 
-import eventstore.api.HandlersInstanceBuilder
-import eventstore.events.EventObject
-import eventstore.metadata.{HandlerMetadata, StreamMetadata}
-import eventstore.stateLoader.DefaultStreamStateLoader
+import sourced.api.HandlersInstanceBuilder
+import sourced.events.EventObject
+import sourced.metadata.{HandlerMetadata, StreamMetadata}
+import sourced.stateLoader.DefaultStreamStateLoader
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.FunSuite
 import testsClasses.{TestEvent, TestEventsRepository, TestHandler}
@@ -21,7 +21,7 @@ class DefaultStreamStateLoaderTests extends FunSuite with MockFactory {
 
     val handlersInstanceBuilder = new AnyRef with HandlersInstanceBuilder
 
-    val loader = new DefaultStreamStateLoader(eventsRepository,handlersInstanceBuilder, streamMetadata)
+    val loader = new DefaultStreamStateLoader(eventsRepository)
 
     val f = loader.loadStreamState(streamType, streamMetadata)
 

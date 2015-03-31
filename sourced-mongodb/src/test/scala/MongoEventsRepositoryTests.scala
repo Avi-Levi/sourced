@@ -1,7 +1,7 @@
 import java.util.concurrent.TimeUnit
 
-import eventStore.mongodb.{MongoConfig, MongoEventsRepository}
-import eventstore.events.EventObject
+import eventStore.mongodb.{MongoConfig, MongoEventsStorage}
+import sourced.events.EventObject
 import org.scalatest.FunSuite
 
 import scala.concurrent.Await
@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class MongoEventsRepositoryTests extends FunSuite{
   val streamId = "someId"
   test("test save events"){
-    val repository = new MongoEventsRepository(MongoConfig("sourced","events", Seq("localhost:27017")))
+    val repository = new MongoEventsStorage(MongoConfig("sourced","events", Seq("localhost:27017")))
     time{
       val f = repository.save(streamId,Seq(EventObject(0,classOf[TestCaseClass].getName, TestCaseClass("xstr",7,8L,true)))) andThen {
         case x=> repository.iterate(streamId,e=>{

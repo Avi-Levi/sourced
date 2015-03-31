@@ -1,6 +1,6 @@
 package testsClasses
 
-import eventstore.EventDispatcher
+import sourced.EventDispatcher
 
 class TestEventDispatcher(val handler:TestHandler) extends EventDispatcher{
 

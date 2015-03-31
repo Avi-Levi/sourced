@@ -1,11 +1,11 @@
 package testsClasses
 
-import eventstore.events.{EventObject, EventsRepository}
+import sourced.events._
 
 import scala.concurrent.{Future, _}
 import scala.util.{Try, Success}
 
-class TestEventsRepository(events:List[EventObject]) extends EventsRepository{
+class TestEventsRepository(events:List[EventObject]) extends EventsStorage{
   
   var newEvents: Array[EventObject] = null
   override def iterate(streamId: String, handleEvent: (EventObject) => Unit): Future[Long] = {

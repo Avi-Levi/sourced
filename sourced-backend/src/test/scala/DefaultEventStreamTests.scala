@@ -5,7 +5,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
 import sourced.backend.stateLoader.{LoadStateResponse, StreamStateLoader}
 import sourced.backend.stream.DefaultEventStream
-import testsClasses.{TestEvent, TestEventDispatcher, TestEventsRepository, TestHandler}
+import testsClasses.{TestEvent, TestEventDispatcher, TestEventsStorage, TestHandler}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -15,7 +15,7 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
   val streamType = "sometype"
 
   var streamStateLoader: StreamStateLoader = null
-  var eventsRepository: TestEventsRepository = null
+  var eventsRepository: TestEventsStorage = null
 
   var handlerMetadata: HandlerMetadata = null
   var streamMetadata: StreamMetadata = null
@@ -26,7 +26,7 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
 
   before{
     this.streamStateLoader = stub[StreamStateLoader]
-    this.eventsRepository = new TestEventsRepository(List())
+    this.eventsRepository = new TestEventsStorage(List())
 
     this.handlerMetadata = HandlerMetadata(classOf[TestHandler],Map(classOf[TestEvent].getName -> Array(classOf[TestHandler].getMethod("handlerMethod",classOf[TestEvent]))))
     this.streamMetadata = StreamMetadata(streamType, Array(handlerMetadata))

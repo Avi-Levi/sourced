@@ -5,7 +5,7 @@ import sourced.backend.events.{EventObject, EventsStorage}
 import scala.concurrent.{Future, _}
 import scala.util.{Success, Try}
 
-class TestEventsRepository(events:List[EventObject]) extends EventsStorage{
+class TestEventsStorage(events:List[EventObject]) extends EventsStorage{
   
   var newEvents: Array[EventObject] = null
   override def iterate(streamId: String, handleEvent: (EventObject) => Unit): Future[Long] = {

@@ -25,7 +25,7 @@ class DefaultStreamStateLoader(private val eventsRepository:EventsStorage)
          val eventMetadata = streamMetadata.getEventMetadata(e.body.getClass)
 
          eventMetadata.topics.foreach{t =>
-           topicToDispatchersMap.get(t).map(dispatchers => dispatchers.foreach(_.dispatch(e.body)))
+           topicToDispatchersMap.get(t).foreach(dispatchers => dispatchers.foreach(_.dispatch(e.body)))
          }
        }
 

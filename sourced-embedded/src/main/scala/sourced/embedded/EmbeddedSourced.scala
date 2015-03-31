@@ -2,25 +2,25 @@ package sourced.embedded
 
 import sourced.backend.events.EventsStorage
 import sourced.backend.exceptions.StreamDefinitionExistsException
-import sourced.backend.metadata.{DefaultHandlerMetadataBuilder, StreamMetadata}
+import sourced.backend.metadata.{HandlerMetadataBuilder, StreamMetadata}
 
 import scala.collection.mutable
 
 object EmbeddedSourced {
-  var eventsStorage : EventsStorage = null
-  private val handlerMetadataBuilder= new DefaultHandlerMetadataBuilder
+
   private val streamTypeToMetadata = mutable.Map[String,StreamMetadata]()
 
-  def getSourcedOperations = new EmbeddedSourcedOperations(eventsStorage, streamTypeToMetadata)
+  def getSourcedOperations()(implicit eventsStorage:EventsStorage) = new EmbeddedSourcedOperations(eventsStorage, streamTypeToMetadata)
 
-  def registerStream(definition:StreamDefinition) : Unit = {
+  def registerStream(definition:StreamDefinition)(implicit handlerMetadataBuilder:HandlerMetadataBuilder) : Unit = {
 
     if(this.streamTypeToMetadata.contains(definition.streamType)){
       throw new StreamDefinitionExistsException(definition.streamType)
     }
 
-    val handlersMetadata = this.handlerMetadataBuilder.forHandlerClasses(definition.handlers)
+    val handlersMetadata = handlerMetadataBuilder.forHandlerClasses(definition.handlers)
 
     this.streamTypeToMetadata.put(definition.streamType, StreamMetadata(definition.streamType,handlersMetadata))
   }
 }
+

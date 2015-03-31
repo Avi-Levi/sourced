@@ -29,12 +29,13 @@
           <artifactId>reactivemongo_2.10</artifactId>
           <version>0.10.5.0.akka23</version>
       </dependency>
+      <dependency>
+          <groupId>org.sourced</groupId>
+          <artifactId>sourced-embedded</artifactId>
+          <version>0.0.1</version>
+          <scope>test</scope>
+      </dependency>
 
-<!--      <dependency>
-          <groupId>org.scala-lang</groupId>
-          <artifactId>scala-pickling_2.10</artifactId>
-          <version>${pickling.version}</version>
-      </dependency>-->
   </dependencies>
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>

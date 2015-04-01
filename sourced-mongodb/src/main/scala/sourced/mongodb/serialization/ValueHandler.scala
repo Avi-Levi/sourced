@@ -1,4 +1,4 @@
-package eventStore.mongodb.serialization
+package sourced.mongodb.serialization
 
 import reactivemongo.bson.BSONValue
 

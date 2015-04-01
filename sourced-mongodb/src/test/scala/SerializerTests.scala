@@ -1,6 +1,6 @@
-import eventStore.mongodb.serialization.EventsSerializer
 import org.scalatest.FunSuite
 import sourced.backend.events.EventObject
+import sourced.mongodb.serialization.EventsSerializer
 
 case class TestCaseClass(xString:String="", xInt:Int=0, xLong:Long=0L, xBoolean: Boolean=false)
 

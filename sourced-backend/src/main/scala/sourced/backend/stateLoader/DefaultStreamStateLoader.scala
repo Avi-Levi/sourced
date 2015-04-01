@@ -9,7 +9,6 @@ import scala.concurrent._
 
 class DefaultStreamStateLoader(private val eventsRepository:EventsStorage)
   extends StreamStateLoader with HandlersInstanceBuilder {
-
      override def loadStreamState(streamId:String, streamMetadata: StreamMetadata) : Future[LoadStateResponse] = {
        val handlersMetadataToInstanceMap = streamMetadata.handlersMetadata.map(m=>(m,this.createHandlerInstance(m.handlerClass)))
 

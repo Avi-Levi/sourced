@@ -1,6 +1,9 @@
-import eventStore.mongodb.{MongoConfig, MongoEventsStorage}
+import eventStore.mongodb.MongoConfig
 import org.scalatest.FunSuite
 import sourced.embedded.{EmbeddedSourced, StreamDefinition}
+import sourced.mongodb.MongoEventsStorage
+import sourced.mongodb.eventsStorage.{MongoEventsStorage, MongoConfig}
+
 class EmbeddedSourcedTests extends FunSuite{
   test("api"){
     import sourced.embedded.Implicits._

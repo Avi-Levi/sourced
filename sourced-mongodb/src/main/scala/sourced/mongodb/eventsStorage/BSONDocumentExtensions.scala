@@ -1,6 +1,6 @@
-package eventStore.mongodb
+package sourced.mongodb.eventsStorage
 
-import reactivemongo.bson.{BSONString, BSONDocument}
+import reactivemongo.bson.{BSONDocument, BSONString}
 
 object BSONDocumentExtensions {
   implicit class ExtendedBSONDocument(doc : BSONDocument){

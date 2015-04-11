@@ -1,10 +1,8 @@
 import java.util.concurrent.TimeUnit
 
-import eventStore.mongodb.MongoConfig
 import org.scalatest.FunSuite
 import sourced.backend.events.EventObject
-import sourced.mongodb.MongoEventsStorage
-import sourced.mongodb.eventsStorage.{MongoEventsStorage, MongoConfig}
+import sourced.mongodb.eventsStorage.{MongoConfig, MongoEventsStorage}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global

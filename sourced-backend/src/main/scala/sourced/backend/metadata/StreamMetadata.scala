@@ -6,8 +6,6 @@ import scala.collection.Iterable
 import scala.collection.mutable.ListBuffer
 
 case class StreamMetadata(streamType:String, handlersMetadata:Array[HandlerMetadata]) {
-  val locker = new AnyRef
-  
   private var classToMetadataMap : Map[Class[_],EventMetadata] = handlersMetadata
     .flatMap(_.topicToMethodsMap.flatMap(_._2))
     .map(_.getParameterTypes.head)
@@ -23,7 +21,7 @@ case class StreamMetadata(streamType:String, handlersMetadata:Array[HandlerMetad
     }
   }
   
-  def addEventMetadata(eventClass:Class[_]) = synchronized{
+  private def addEventMetadata(eventClass:Class[_]) = classToMetadataMap.synchronized{
     classToMetadataMap.get(eventClass) match {
       case Some(metadata) => metadata
       case None =>

@@ -1,6 +1,5 @@
 package sourced.backend.stateLoader
 
-import sourced.backend.EventDispatcher
-import sourced.backend.metadata.HandlerMetadata
+import sourced.backend.TopicsToHandlersIndex
 
-case class LoadStateResponse(lastEventIndex:Long,eventDispatchers:Map[String,Iterable[EventDispatcher]], handlers:Iterable[(HandlerMetadata,AnyRef)]) {}
+case class LoadStateResponse(lastEventIndex:Long,handlersIndex: TopicsToHandlersIndex) {}

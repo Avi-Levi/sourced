@@ -1,11 +1,11 @@
 package testsClasses
 
-import sourced.handlers.api.{WithStreamRef, HandlerMethod}
+import sourced.handlers.api.{EventsHandler, HandlerMethod}
 
-class TestHandler extends WithStreamRef{
-  var testEventDispatched = false
+class TestHandler extends EventsHandler{
+  var dispatchCount = 0
   @HandlerMethod
-  def handlerMethod(e:TestEvent) = testEventDispatched = true
+  def handlerMethod(e:TestEvent) = dispatchCount += 1
   
   def hasStreamRef = this.stream != null
 }

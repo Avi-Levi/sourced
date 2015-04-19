@@ -2,10 +2,11 @@ import java.util.concurrent.TimeUnit
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FunSuite}
+import sourced.backend.TopicsToHandlersIndex
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
 import sourced.backend.stateLoader.{LoadStateResponse, StreamStateLoader}
 import sourced.backend.stream.DefaultEventStream
-import testsClasses.{TestEvent, TestEventDispatcher, TestEventsStorage, TestHandler}
+import testsClasses.{TestEvent, TestEventsStorage, TestHandler}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -19,10 +20,8 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
 
   var handlerMetadata: HandlerMetadata = null
   var streamMetadata: StreamMetadata = null
-  var handler = new TestHandler
-  var dispatcher: TestEventDispatcher = null
-  var handlers: List[(HandlerMetadata, TestHandler)] = null
-  var dispatchers: Map[String, List[TestEventDispatcher]] = null
+  var handler : TestHandler = null
+  var handlersIndex : TopicsToHandlersIndex = null
 
   before{
     this.streamStateLoader = stub[StreamStateLoader]
@@ -30,24 +29,22 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
 
     this.handlerMetadata = HandlerMetadata(classOf[TestHandler],Map(classOf[TestEvent].getName -> Array(classOf[TestHandler].getMethod("handlerMethod",classOf[TestEvent]))))
     this.streamMetadata = StreamMetadata(streamType, Array(handlerMetadata))
-    this.handler = new TestHandler
-    this.dispatcher = new TestEventDispatcher(handler)
-    this.handlers = List((handlerMetadata,handler))
-    this.dispatchers = Map(classOf[TestEvent].getName -> List(dispatcher))
+    this.handlersIndex = new TopicsToHandlersIndex(Array(this.handlerMetadata))
+    this.handler = this.handlersIndex.handlersInstances.head.asInstanceOf[TestHandler]
   }
-  test("a published event is dispatched to a handler"){
+  test("a published event is dispatched to a handler once"){
 
-    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,dispatchers,handlers)))
+    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,this.handlersIndex)))
 
         val stream = new DefaultEventStream(streamId,streamStateLoader, streamMetadata, eventsRepository)
 
     Await.ready(stream.push(TestEvent()),Duration(100,TimeUnit.MILLISECONDS))
 
-    assert(handler.testEventDispatched)
+    assert(handler.dispatchCount == 1)
   }
   test("stream ref is injected"){
 
-    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,dispatchers,handlers)))
+    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,this.handlersIndex)))
 
     val stream = new DefaultEventStream(streamId, streamStateLoader, streamMetadata, eventsRepository)
     
@@ -56,7 +53,7 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
     assert(handler.hasStreamRef)
   }
   test("dispatching event with no handlers listeners doesn't fail"){
-    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,dispatchers,handlers)))
+    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,this.handlersIndex)))
 
     val stream = new DefaultEventStream(streamId, streamStateLoader, streamMetadata, eventsRepository)
     Await.ready(stream.push(new AnyRef),Duration(100,TimeUnit.MILLISECONDS))
@@ -64,7 +61,7 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
     assert(true)
   }
   test("new events are forwarded to events repository"){
-    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,dispatchers,handlers)))
+    (streamStateLoader.loadStreamState _).when(streamId,streamMetadata).returns(Future.successful(LoadStateResponse(10,this.handlersIndex)))
 
     val stream = new DefaultEventStream(streamId, streamStateLoader, streamMetadata, eventsRepository)
     Await.ready(stream.push(new AnyRef),Duration(100,TimeUnit.MILLISECONDS))

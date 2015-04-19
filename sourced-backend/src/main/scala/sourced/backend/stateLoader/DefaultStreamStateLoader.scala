@@ -1,42 +1,34 @@
 package sourced.backend.stateLoader
 
-import sourced.backend.{DefaultEventDispatcher, HandlersInstanceBuilder}
 import sourced.backend.events.{EventObject, EventsStorage}
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
+import sourced.backend.{DefaultEventDispatcher, TopicsToHandlersIndex}
+import sourced.handlers.api.EventsHandler
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
 class DefaultStreamStateLoader(private val eventsRepository:EventsStorage)
-  extends StreamStateLoader with HandlersInstanceBuilder {
+  extends StreamStateLoader {
      override def loadStreamState(streamId:String, streamMetadata: StreamMetadata) : Future[LoadStateResponse] = {
-       val handlersMetadataToInstanceMap = streamMetadata.handlersMetadata.map(m=>(m,this.createHandlerInstance(m.handlerClass)))
-
-       replayEvents(streamId, handlersMetadataToInstanceMap, streamMetadata)
-     }
-     private def replayEvents(streamId:String,handlers:Iterable[(HandlerMetadata,AnyRef)],streamMetadata: StreamMetadata) : Future[LoadStateResponse] = {
        val p = promise[LoadStateResponse]()
-
-       val dispatchers = handlers.flatMap(x=>this.createDispatchersForHandler(x._2,x._1))
-       val topicToDispatchersMap = dispatchers.groupBy(_.topic)
+       val handlersIndex = new TopicsToHandlersIndex(streamMetadata.handlersMetadata)
 
        def handleEventLoaded(e: EventObject) = {
          val eventMetadata = streamMetadata.getEventMetadata(e.body.getClass)
-
-         eventMetadata.topics.foreach{t =>
-           topicToDispatchersMap.get(t).foreach(dispatchers => dispatchers.foreach(_.dispatch(e.body)))
-         }
+         handlersIndex.dispatch(e.body,eventMetadata)
        }
 
        this.eventsRepository.iterate(streamId, handleEventLoaded) onSuccess {
-         case lastEventIndex => p.success(LoadStateResponse(lastEventIndex,topicToDispatchersMap,handlers))
+         case lastEventIndex => p.success(LoadStateResponse(lastEventIndex,handlersIndex))
        }
 
        p.future
      }
-     private def createDispatchersForHandler(handlerInstance:AnyRef, handlerMetadata:HandlerMetadata) = {
+     private def createDispatchersForHandler(handlerInstance:EventsHandler, handlerMetadata:HandlerMetadata) = {
        handlerMetadata.topicToMethodsMap.flatMap{x=>
-         x._2.map(m=>new DefaultEventDispatcher(x._1,m,handlerInstance))
+         val (topic,methods) = x
+         methods.map(m=>new DefaultEventDispatcher(topic,m,handlerInstance))
        }
      }
    }

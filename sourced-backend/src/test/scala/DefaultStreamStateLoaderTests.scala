@@ -27,14 +27,12 @@ class DefaultStreamStateLoaderTests extends FunSuite with MockFactory {
 
     val res = Await.result(f,Duration(100,TimeUnit.MILLISECONDS))
 
-    assert(res.handlers.size == 1)
-    assert(res.eventDispatchers.size == 1)
-    assert(res.eventDispatchers.head._1.equals(classOf[TestEvent].getName))
-    assert(res.eventDispatchers.head._2.size == 1)
-    assert(res.eventDispatchers.head._2.head.topic.equals(classOf[TestEvent].getName))
-    assert(res.handlers.size == 1)
-    assert(res.handlers.head._1.handlerClass.equals(classOf[TestHandler]))
-    assert(res.handlers.head._2.getClass.equals(classOf[TestHandler]))
-    assert(res.handlers.head._2.asInstanceOf[TestHandler].testEventDispatched)
+
+    assert(res.handlersIndex.topicToDispatchersMap.keys.head.equals(classOf[TestEvent].getName))
+    assert(res.handlersIndex.topicToDispatchersMap.flatMap(_._2).size == 1)
+
+    assert(res.handlersIndex.handlersInstances.size == 1)
+    assert(res.handlersIndex.handlersInstances.head.getClass.equals(classOf[TestHandler]))
+    assert(res.handlersIndex.handlersInstances.head.asInstanceOf[TestHandler].dispatchCount == 1)
   }
 }

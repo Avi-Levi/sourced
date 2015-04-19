@@ -1,13 +1,10 @@
 package sourced.backend.stream
 
 import sourced.backend._
-import sourced.backend.events.EventObject
-import sourced.backend.events.EventsStorage
-import sourced.backend.metadata.{StreamMetadata, EventMetadata}
+import sourced.backend.events.{EventObject, EventsStorage}
+import sourced.backend.metadata.StreamMetadata
 import sourced.backend.stateLoader.{LoadStateResponse, StreamStateLoader}
-import sourced.handlers.api.WithStreamRef
 
-import scala.collection._
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
@@ -19,8 +16,8 @@ class DefaultEventStream(private val streamId: String,
                          private val eventsStorage: EventsStorage)
   extends Logging{
 
-  private val eventsDispatchers = mutable.Map[String,ListBuffer[EventDispatcher]]()
-  private val newEvents = ListBuffer[EventObject]()
+  private var handlersCollection : TopicsToHandlersIndex = null
+  private lazy val newEvents = ListBuffer[EventObject]()
   
   private val loadStateFuture = loadState
   private var currentEventIndex = 0L
@@ -52,14 +49,13 @@ class DefaultEventStream(private val streamId: String,
 
   private[sourced] def pushSync(msg: AnyRef): Unit = {
     val eventObj = EventObject(this.nextEventIndex, msg.getClass.getName, msg)
+
     this.newEvents += eventObj
 
     val eventMetadata = this.streamMetadata.getEventMetadata(msg.getClass)
-    this.dispatchToHandlers(msg, eventMetadata)
-  }
 
-  private def dispatchToHandlers(msg: AnyRef, eventMetadata: EventMetadata) = 
-    eventMetadata.topics.foreach(t => this.eventsDispatchers.get(t).map(_.foreach(_.dispatch(msg))))
+    this.handlersCollection.dispatch(msg,eventMetadata)
+  }
 
   private def loadState : Future[Unit] = {
     val p = promise[Unit]()
@@ -76,11 +72,8 @@ class DefaultEventStream(private val streamId: String,
   }
 
   private def handleStateLoaded(response: LoadStateResponse): Unit = {
-    this.injectStreamRef(response.handlers.map(_._2))
-    response.eventDispatchers.foreach {
-      x =>
-        this.eventsDispatchers.getOrElseUpdate(x._1, new ListBuffer[EventDispatcher]()) ++= x._2
-    }
+    this.injectStreamRef(response.handlersIndex)
+    this.handlersCollection = response.handlersIndex
   }
 
   private def nextEventIndex = {
@@ -88,8 +81,8 @@ class DefaultEventStream(private val streamId: String,
     this.currentEventIndex
   }
 
-  private def injectStreamRef(handlers:Iterable[AnyRef]) = {
+  private def injectStreamRef(handlersCollection: TopicsToHandlersIndex) = {
     val streamRef = new DefaultStreamRef(this)
-    handlers.filter(_.isInstanceOf[WithStreamRef]).map(_.asInstanceOf[WithStreamRef]).foreach(_.setStreamRef(streamRef))
+    handlersCollection.handlersInstances.foreach{_.setStreamRef(streamRef)}
   }
 }

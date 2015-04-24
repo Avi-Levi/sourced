@@ -1,9 +1,11 @@
 package sourced.backend.stream
 
 import sourced.backend._
+import sourced.backend.dispatchersIndex.{TopicsToHandlersIndex}
 import sourced.backend.events.{EventObject, EventsStorage}
 import sourced.backend.metadata.StreamMetadata
 import sourced.backend.stateLoader.{LoadStateResponse, StreamStateLoader}
+import sourced.handlers.api.EventsHandler
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,7 +17,7 @@ class DefaultEventStream(private val streamId: String,
                          private val streamMetadata: StreamMetadata,
                          private val eventsStorage: EventsStorage)
   extends Logging{
-
+  
   private var handlersCollection : TopicsToHandlersIndex = null
   private lazy val newEvents = ListBuffer[EventObject]()
   
@@ -52,9 +54,7 @@ class DefaultEventStream(private val streamId: String,
 
     this.newEvents += eventObj
 
-    val eventMetadata = this.streamMetadata.getEventMetadata(msg.getClass)
-
-    this.handlersCollection.dispatch(msg,eventMetadata)
+    this.handlersCollection.dispatch(msg)
   }
 
   private def loadState : Future[Unit] = {
@@ -70,7 +70,7 @@ class DefaultEventStream(private val streamId: String,
     
     p.future
   }
-
+  
   private def handleStateLoaded(response: LoadStateResponse): Unit = {
     this.injectStreamRef(response.handlersIndex)
     this.handlersCollection = response.handlersIndex
@@ -81,8 +81,8 @@ class DefaultEventStream(private val streamId: String,
     this.currentEventIndex
   }
 
-  private def injectStreamRef(handlersCollection: TopicsToHandlersIndex) = {
+  private def injectStreamRef(handlersIndex: TopicsToHandlersIndex) = {
     val streamRef = new DefaultStreamRef(this)
-    handlersCollection.handlersInstances.foreach{_.setStreamRef(streamRef)}
+    handlersIndex.forEachInstance(_.asInstanceOf[EventsHandler].setStreamRef(streamRef))
   }
 }

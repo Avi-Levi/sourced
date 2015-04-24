@@ -2,4 +2,4 @@ package sourced.backend.metadata
 
 import java.lang.reflect.Method
 
-case class HandlerMetadata(handlerClass:Class[_],topicToMethodsMap:Map[String,Array[Method]]) {}
+case class HandlerMetadata(handlerClass: Class[_], topicToMethodsMap: Map[String, Array[Method]])

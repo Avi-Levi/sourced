@@ -2,7 +2,7 @@ import java.util.concurrent.TimeUnit
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import sourced.backend.TopicsToHandlersIndex
+import sourced.backend.dispatchersIndex.{HandlerInfo, TopicsToStreamHandlersIndex}
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
 import sourced.backend.stateLoader.{LoadStateResponse, StreamStateLoader}
 import sourced.backend.stream.DefaultEventStream
@@ -21,7 +21,7 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
   var handlerMetadata: HandlerMetadata = null
   var streamMetadata: StreamMetadata = null
   var handler : TestHandler = null
-  var handlersIndex : TopicsToHandlersIndex = null
+  var handlersIndex : TopicsToStreamHandlersIndex = null
 
   before{
     this.streamStateLoader = stub[StreamStateLoader]
@@ -29,8 +29,8 @@ class DefaultEventStreamTests extends FunSuite with MockFactory with BeforeAndAf
 
     this.handlerMetadata = HandlerMetadata(classOf[TestHandler],Map(classOf[TestEvent].getName -> Array(classOf[TestHandler].getMethod("handlerMethod",classOf[TestEvent]))))
     this.streamMetadata = StreamMetadata(streamType, Array(handlerMetadata))
-    this.handlersIndex = new TopicsToHandlersIndex(Array(this.handlerMetadata))
-    this.handler = this.handlersIndex.handlersInstances.head.asInstanceOf[TestHandler]
+    this.handlersIndex = new TopicsToStreamHandlersIndex(Array(this.handlerMetadata).map(h=>HandlerInfo(h.topicToMethodsMap,()=>new TestHandler)),streamMetadata.getEventMetadata)
+    this.handler = this.handlersIndex.handlersInstances.head.instance.asInstanceOf[TestHandler]
   }
   test("a published event is dispatched to a handler once"){
 

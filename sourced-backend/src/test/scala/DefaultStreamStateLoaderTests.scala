@@ -2,7 +2,8 @@ import java.util.concurrent.TimeUnit
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.FunSuite
-import sourced.backend.HandlersInstanceBuilder
+import sourced.backend.HandlersFactory
+import sourced.backend.dispatchersIndex.TopicsToStreamHandlersIndex
 import sourced.backend.events.EventObject
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
 import sourced.backend.stateLoader.DefaultStreamStateLoader
@@ -19,20 +20,20 @@ class DefaultStreamStateLoaderTests extends FunSuite with MockFactory {
     val streamTypeToHandlersMetadata = Map(streamType -> streamMetadata)
     val testEventsStorage = new TestEventsStorage(List(EventObject(0, "a", TestEvent())))
 
-    val handlersInstanceBuilder = new AnyRef with HandlersInstanceBuilder
+    val handlersInstanceBuilder = new AnyRef with HandlersFactory
 
     val loader = new DefaultStreamStateLoader(testEventsStorage)
 
     val f = loader.loadStreamState(streamType, streamMetadata)
 
-    val res = Await.result(f,Duration(100,TimeUnit.MILLISECONDS))
+    val handlersIndex = Await.result(f,Duration(100,TimeUnit.MILLISECONDS)).handlersIndex.asInstanceOf[TopicsToStreamHandlersIndex]
 
 
-    assert(res.handlersIndex.topicToDispatchersMap.keys.head.equals(classOf[TestEvent].getName))
-    assert(res.handlersIndex.topicToDispatchersMap.flatMap(_._2).size == 1)
+    assert(handlersIndex.topicToDispatchersMap.keys.head.equals(classOf[TestEvent].getName))
+    assert(handlersIndex.topicToDispatchersMap.flatMap(_._2).size == 1)
 
-    assert(res.handlersIndex.handlersInstances.size == 1)
-    assert(res.handlersIndex.handlersInstances.head.getClass.equals(classOf[TestHandler]))
-    assert(res.handlersIndex.handlersInstances.head.asInstanceOf[TestHandler].dispatchCount == 1)
+    assert(handlersIndex.handlersInstances.size == 1)
+    assert(handlersIndex.handlersInstances.head.instance.getClass.equals(classOf[TestHandler]))
+    assert(handlersIndex.handlersInstances.head.instance.asInstanceOf[TestHandler].dispatchCount == 1)
   }
 }

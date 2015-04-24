@@ -1,22 +1,22 @@
 package sourced.backend.stateLoader
 
+import sourced.backend.HandlersFactory
+import sourced.backend.dispatchersIndex.{HandlerInfo, TopicsToStreamHandlersIndex}
 import sourced.backend.events.{EventObject, EventsStorage}
-import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
-import sourced.backend.{DefaultEventDispatcher, TopicsToHandlersIndex}
-import sourced.handlers.api.EventsHandler
+import sourced.backend.metadata.StreamMetadata
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
 class DefaultStreamStateLoader(private val eventsRepository:EventsStorage)
-  extends StreamStateLoader {
+  extends StreamStateLoader with HandlersFactory{
      override def loadStreamState(streamId:String, streamMetadata: StreamMetadata) : Future[LoadStateResponse] = {
        val p = promise[LoadStateResponse]()
-       val handlersIndex = new TopicsToHandlersIndex(streamMetadata.handlersMetadata)
+       val handlersInfo = streamMetadata.handlersMetadata.map(hm => HandlerInfo(hm.topicToMethodsMap,()=>createHandlerInstance(hm.handlerClass)))
+       lazy val handlersIndex = new TopicsToStreamHandlersIndex(handlersInfo,streamMetadata.getEventMetadata)
 
        def handleEventLoaded(e: EventObject) = {
-         val eventMetadata = streamMetadata.getEventMetadata(e.body.getClass)
-         handlersIndex.dispatch(e.body,eventMetadata)
+         handlersIndex.dispatch(e.body)
        }
 
        this.eventsRepository.iterate(streamId, handleEventLoaded) onSuccess {
@@ -24,11 +24,5 @@ class DefaultStreamStateLoader(private val eventsRepository:EventsStorage)
        }
 
        p.future
-     }
-     private def createDispatchersForHandler(handlerInstance:EventsHandler, handlerMetadata:HandlerMetadata) = {
-       handlerMetadata.topicToMethodsMap.flatMap{x=>
-         val (topic,methods) = x
-         methods.map(m=>new DefaultEventDispatcher(topic,m,handlerInstance))
-       }
      }
    }

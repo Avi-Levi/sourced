@@ -3,7 +3,7 @@ package testsClasses
 import sourced.backend.events.{EventObject, EventsStorage}
 
 import scala.concurrent.{Future, _}
-import scala.util.{Success, Try}
+import scala.util.Success
 
 class TestEventsStorage(events:List[EventObject]) extends EventsStorage{
   
@@ -13,8 +13,8 @@ class TestEventsStorage(events:List[EventObject]) extends EventsStorage{
     promise[Long]().complete(Success(events.size)).future
   }
 
-  override def save(streamId:String, events: Iterable[EventObject]): Future[Try[Unit]] = {
+  def save(streamId:String, events:Iterable[EventObject]) : Future[Unit] = {
     this.newEvents = events.toArray
-    Future.successful(Success())
+    Future.successful()
   }
 }

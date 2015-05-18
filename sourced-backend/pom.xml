@@ -24,6 +24,11 @@
           <artifactId>sourced-handlers-api</artifactId>
           <version>0.0.1</version>
       </dependency>
+      <dependency>
+          <groupId>org.sourced</groupId>
+          <artifactId>sourced-messages</artifactId>
+          <version>0.0.1</version>
+      </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>

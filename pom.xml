@@ -12,6 +12,7 @@
 	<description>event sourcing library</description>
 	
 	<modules>
+        <module>sourced-messages</module>
         <module>sourced-backend</module>
         <module>sourced-client-api</module>
         <module>sourced-handlers-api</module>
@@ -27,10 +28,12 @@
     	<scala.tools.version>2.15.2</scala.tools.version>
    		<scala.version>2.10.4</scala.version>
         <pickling.version>0.9.1</pickling.version>
+        <akka.version>2.3.9</akka.version>
+        <akka.testkit.version>2.3.9</akka.testkit.version>
   	</properties>
 
   	<dependencies>
-      <dependency>
+        <dependency>
 		  <groupId>org.scala-lang</groupId>
 		  <artifactId>scala-library</artifactId>
 		  <version>${scala.version}</version>
@@ -41,6 +44,17 @@
           <version>2.2.1</version>
           <scope>test</scope>
       </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.10</artifactId>
+            <version>${akka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-testkit_2.10</artifactId>
+            <version>${akka.testkit.version}</version>
+            <scope>test</scope>
+        </dependency>
       <dependency>
           <groupId>org.scalamock</groupId>
           <artifactId>scalamock-scalatest-support_2.10</artifactId>

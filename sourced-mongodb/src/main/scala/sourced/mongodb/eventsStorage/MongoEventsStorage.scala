@@ -9,7 +9,7 @@ import sourced.mongodb.serialization.EventsSerializer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, _}
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 class MongoEventsStorage(private val config: MongoConfig) extends EventsStorage{
 
@@ -36,15 +36,10 @@ class MongoEventsStorage(private val config: MongoConfig) extends EventsStorage{
     p.future
   }
 
-  override def save(streamId:String, events: Iterable[EventObject]): Future[Try[Unit]] = {
+  override def save(streamId:String, events: Iterable[EventObject]): Future[Unit] = {
     import BSONDocumentExtensions._
 
-    val p = promise[Try[Unit]]()
-    collection.bulkInsert(Enumerator.enumerate(events.map(EventsSerializer.toDocument(_).setStreamId(streamId)))) onComplete{
-      case Success(x)=> p.success(Success(Unit))
-      case Failure(t)=> p.failure(t)
-    }
-    p.future
+    collection.bulkInsert(Enumerator.enumerate(events.map(EventsSerializer.toDocument(_).setStreamId(streamId)))).map(x=>Unit)
   }
 
   private def connect(config: MongoConfig) : BSONCollection = {

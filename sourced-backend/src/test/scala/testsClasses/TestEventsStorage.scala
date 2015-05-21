@@ -3,16 +3,29 @@ package testsClasses
 import sourced.backend.events.{EventObject, EventsStorage}
 
 import scala.concurrent.{Future, _}
-import scala.util.Success
 
-class TestEventsStorage(events:List[EventObject]) extends EventsStorage{
+class TestEventsStorage(events:List[EventObject], waitTime:Long = 0)(implicit execctx: ExecutionContext) extends EventsStorage{
   
   var newEvents: Array[EventObject] = null
   override def iterate(streamId: String, handleEvent: (EventObject) => Unit): Future[Long] = {
-    events.foreach(handleEvent)
-    promise[Long]().complete(Success(events.size)).future
+    val res: Future[Long] = if(waitTime == 0){
+      Future.successful(doIterate(handleEvent))
+    }else{
+      future[Long]{
+        Thread.sleep(waitTime)
+        doIterate(handleEvent)
+      }
+    }
+
+
+
+    res
   }
 
+  def doIterate(handleEvent: (EventObject) => Unit) = {
+    events.foreach(handleEvent)
+    events.size
+  }
   def save(streamId:String, events:Iterable[EventObject]) : Future[Unit] = {
     this.newEvents = events.toArray
     Future.successful()

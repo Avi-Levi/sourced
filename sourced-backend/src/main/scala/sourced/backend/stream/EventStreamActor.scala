@@ -1,21 +1,20 @@
 package sourced.backend.stream
 
-import akka.actor.{ActorRef, Actor}
-import sourced.backend.dispatchersIndex.TopicsToHandlersIndex
+import akka.actor.{Actor, ActorRef}
+import sourced.backend.HandlersFactory
+import sourced.backend.dispatchersIndex.{HandlerInfo, TopicsToHandlersIndex, TopicsToStreamHandlersIndex}
 import sourced.backend.events.{EventObject, EventsStorage}
 import sourced.backend.metadata.StreamMetadata
-import sourced.backend.stateLoader.{LoadStateResponse, StreamStateLoader}
 import sourced.handlers.api.{EventsHandler, StreamRef}
-import sourced.messages.{PushFailure, PushSuccess, PushEvents}
+import sourced.messages._
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent._
 import scala.util.{Failure, Success}
 
 class EventStreamActor(private val streamId: String,
-                       private val stateLoader:StreamStateLoader,
                        private val streamMetadata: StreamMetadata,
-                       private val eventsStorage: EventsStorage) extends Actor{
+                       private val eventsStorage: EventsStorage) extends Actor with HandlersFactory{
 
   class StreamRefImpl() extends StreamRef{
     override def push(msg: AnyRef): Unit = pushSingle(msg)
@@ -33,7 +32,11 @@ class EventStreamActor(private val streamId: String,
       if(loadStateFuture.isCompleted){
         handlePushNewEvents(msg, sender())
       }else{
-        loadStateFuture.onSuccess{case _ => self ! PushNewEventsWithSender(msg,sender()) }
+        val originalSender = sender()
+        loadStateFuture.onComplete{
+          case Success(_) => self ! PushNewEventsWithSender(msg,originalSender)
+          case Failure(t) => throw t
+        }
       }
     case msg:PushNewEventsWithSender => handlePushNewEvents(msg.original, msg.sender)
   }
@@ -56,16 +59,21 @@ class EventStreamActor(private val streamId: String,
       sender ! PushSuccess(msg.requestCorrelationKey)
     }
   }
+  def loadState : Future[Unit] = {
+    val handlersInfo = streamMetadata.handlersMetadata.map(hm => HandlerInfo(hm.topicToMethodsMap,()=>createHandlerInstance(hm.handlerClass)))
+    lazy val handlersIndex = new TopicsToStreamHandlersIndex(handlersInfo,streamMetadata.getEventMetadata)
 
-  private def loadState : Future[Unit] = {
-    import context.dispatcher
+    def handleEventLoaded(e: EventObject) = {
+      handlersIndex.dispatch(e.body)
+    }
 
-    this.stateLoader.loadStreamState(this.streamId, this.streamMetadata).map(handleStateLoaded)
+    eventsStorage.iterate(streamId, handleEventLoaded).map(lastEventIndex => handleStateLoaded(lastEventIndex,handlersIndex))
   }
 
-  private def handleStateLoaded(response: LoadStateResponse): Unit = {
-    this.injectStreamRef(response.handlersIndex)
-    this.handlersIndex = response.handlersIndex
+
+  private def handleStateLoaded(lastEventIndex:Long,handlersIndex: TopicsToHandlersIndex): Unit = {
+    this.injectStreamRef(handlersIndex)
+    this.handlersIndex = handlersIndex
   }
   private def injectStreamRef(handlersIndex: TopicsToHandlersIndex) = {
     val streamRef = new StreamRefImpl()

@@ -1,3 +1,3 @@
 package sourced.messages
 
-case class PushEvents(streamId:String, requestCorrelationKey:String, events:Array[AnyRef])
+case class PushEvents(requestCorrelationKey:String, events:Array[AnyRef])

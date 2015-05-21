@@ -6,11 +6,11 @@ import sourced.backend.metadata.{HandlerMetadataBuilder, StreamMetadata}
 
 import scala.collection.mutable
 
-object EmbeddedSourced {
+object EmbeddedSourcedConfiguration {
 
   private val streamTypeToMetadata = mutable.Map[String,StreamMetadata]()
 
-  def getSourcedOperations()(implicit eventsStorage:EventsStorage) = new EmbeddedSourcedOperations(eventsStorage, streamTypeToMetadata)
+  def getSourcedOperations()(implicit eventsStorage:EventsStorage) = new EmbeddedSourcedClientFactory(eventsStorage, streamTypeToMetadata)
 
   def registerStream(definition:StreamDefinition)(implicit handlerMetadataBuilder:HandlerMetadataBuilder) : Unit = {
 

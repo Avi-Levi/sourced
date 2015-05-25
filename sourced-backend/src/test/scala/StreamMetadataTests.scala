@@ -1,8 +1,6 @@
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
-import sourced.testing.utils.{TestEvent, TestHandler}
-import testsClasses.TestEvent2
 
 class StreamMetadataTests extends FunSuite with BeforeAndAfter{
   var handlerMetadata: HandlerMetadata = null

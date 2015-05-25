@@ -17,7 +17,7 @@ import scala.collection._
 import scala.concurrent.Future
 import scala.util._
 
-class EmbeddedSourcedClientFactory(private val actorSystem: ActorSystem, private val eventsStorage: EventsStorage, private val streamTypeToMetadata : Map[String,StreamMetadata]) extends SourcedClientFactory{
+class EmbeddedSourcedClientFactory(val actorSystem: ActorSystem, val eventsStorage: EventsStorage, val streamTypeToMetadata : Map[String,StreamMetadata]) extends SourcedClientFactory{
 
   implicit val executionContext = actorSystem.dispatcher
   implicit val defaultTimeout = Timeout(100,TimeUnit.MILLISECONDS)

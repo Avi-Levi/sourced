@@ -1,6 +1,4 @@
-package sourced.testing.utils
-
-import sourced.handlers.api.{HandlerMethod, EventsHandler}
+import sourced.handlers.api.{EventsHandler, HandlerMethod}
 
 class TestHandler extends EventsHandler{
   var dispatchCount = 0

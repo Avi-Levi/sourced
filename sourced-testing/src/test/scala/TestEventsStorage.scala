@@ -1,5 +1,3 @@
-package sourced.testing.utils
-
 import sourced.backend.api.{EventObject, EventsStorage}
 
 import scala.concurrent.{Future, _}

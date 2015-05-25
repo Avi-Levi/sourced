@@ -11,7 +11,6 @@ import sourced.backend.api.EventObject
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
 import sourced.backend.stream.EventStreamActor
 import sourced.messages.PushEvents
-import sourced.testing.utils.{TestEvent, TestHandler, TestEventsStorage}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, _}

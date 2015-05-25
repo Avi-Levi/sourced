@@ -1,6 +1,6 @@
 import org.scalatest.FunSuite
 import sourced.backend.metadata.DefaultHandlerMetadataBuilder
-import testsClasses.{TestEvent, TestHandler}
+import sourced.testing.utils.{TestEvent, TestHandler}
 
 class HandlerMetadataBuilderTests extends FunSuite{
   test("build simple handler metadata"){

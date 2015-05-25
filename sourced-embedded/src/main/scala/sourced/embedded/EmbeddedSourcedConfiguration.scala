@@ -1,16 +1,18 @@
 package sourced.embedded
 
-import sourced.backend.events.EventsStorage
+import akka.actor.ActorSystem
+import sourced.backend.api.EventsStorage
 import sourced.backend.exceptions.StreamDefinitionExistsException
 import sourced.backend.metadata.{HandlerMetadataBuilder, StreamMetadata}
+import sourced.client.api.SourcedClientFactory
 
 import scala.collection.mutable
 
-object EmbeddedSourcedConfiguration {
+class EmbeddedSourcedConfiguration(eventsStorage:EventsStorage)(implicit actorSystem:ActorSystem) {
 
   private val streamTypeToMetadata = mutable.Map[String,StreamMetadata]()
 
-  def getSourcedOperations()(implicit eventsStorage:EventsStorage) = new EmbeddedSourcedClientFactory(eventsStorage, streamTypeToMetadata)
+  def newClientFactory() : SourcedClientFactory = new EmbeddedSourcedClientFactory(actorSystem, eventsStorage, streamTypeToMetadata)
 
   def registerStream(definition:StreamDefinition)(implicit handlerMetadataBuilder:HandlerMetadataBuilder) : Unit = {
 

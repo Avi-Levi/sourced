@@ -4,7 +4,7 @@ import play.api.libs.iteratee.{Enumerator, Iteratee}
 import reactivemongo.api._
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson.{BSONDocument, _}
-import sourced.backend.events.{EventObject, EventsStorage}
+import sourced.backend.api.{EventObject, EventsStorage}
 import sourced.mongodb.serialization.EventsSerializer
 
 import scala.concurrent.ExecutionContext.Implicits.global

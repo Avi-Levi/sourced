@@ -1,12 +1,13 @@
-package testsClasses
+package sourced.testing.utils
 
-import sourced.backend.events.{EventObject, EventsStorage}
+import sourced.backend.api.{EventObject, EventsStorage}
 
 import scala.concurrent.{Future, _}
 
-class TestEventsStorage(events:List[EventObject], waitTime:Long = 0)(implicit execctx: ExecutionContext) extends EventsStorage{
-  
+class TestEventsStorage(events:List[EventObject], waitTime:Long = 0)(implicit val executionContext: ExecutionContext) extends EventsStorage{
+
   var newEvents: Array[EventObject] = null
+
   override def iterate(streamId: String, handleEvent: (EventObject) => Unit): Future[Long] = {
     val res: Future[Long] = if(waitTime == 0){
       Future.successful(doIterate(handleEvent))
@@ -16,8 +17,6 @@ class TestEventsStorage(events:List[EventObject], waitTime:Long = 0)(implicit ex
         doIterate(handleEvent)
       }
     }
-
-
 
     res
   }

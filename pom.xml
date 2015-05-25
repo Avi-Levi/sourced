@@ -18,6 +18,8 @@
         <module>sourced-handlers-api</module>
         <module>sourced-mongodb</module>
         <module>sourced-embedded</module>
+        <module>sourced-testing</module>
+        <module>sourced-backend-api</module>
 	</modules>
 
 	<properties>

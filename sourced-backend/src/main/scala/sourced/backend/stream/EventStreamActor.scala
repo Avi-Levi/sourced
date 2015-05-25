@@ -2,8 +2,8 @@ package sourced.backend.stream
 
 import akka.actor.{Actor, ActorRef}
 import sourced.backend.HandlersFactory
+import sourced.backend.api.{EventObject, EventsStorage}
 import sourced.backend.dispatchersIndex.{HandlerInfo, TopicsToHandlersIndex, TopicsToStreamHandlersIndex}
-import sourced.backend.events.{EventObject, EventsStorage}
 import sourced.backend.metadata.StreamMetadata
 import sourced.handlers.api.{EventsHandler, StreamRef}
 import sourced.messages._

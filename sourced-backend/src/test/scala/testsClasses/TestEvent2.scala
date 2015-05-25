@@ -1,3 +1,3 @@
 package testsClasses
 
-case class TestEvent2 (){}
+case class TestEvent2()

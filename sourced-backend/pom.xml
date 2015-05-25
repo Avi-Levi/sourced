@@ -26,8 +26,19 @@
       </dependency>
       <dependency>
           <groupId>org.sourced</groupId>
+          <artifactId>sourced-backend-api</artifactId>
+          <version>0.0.1</version>
+      </dependency>
+      <dependency>
+          <groupId>org.sourced</groupId>
           <artifactId>sourced-messages</artifactId>
           <version>0.0.1</version>
+      </dependency>
+      <dependency>
+          <groupId>org.sourced</groupId>
+          <artifactId>sourced-testing</artifactId>
+          <version>0.0.1</version>
+          <scope>test</scope>
       </dependency>
   </dependencies>
   <build>

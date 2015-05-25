@@ -3,7 +3,7 @@ package sourced.backend.views
 import java.util.UUID
 
 import akka.actor.{Actor, ActorRef}
-import sourced.backend.events.EventObject
+import sourced.backend.api.EventObject
 import sourced.backend.metadata.StreamMetadata
 import sourced.backend.views.messages._
 import sourced.backend.views.storage.ViewsStorage

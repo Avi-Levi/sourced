@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern._
 import akka.util.Timeout
-import sourced.backend.events.EventsStorage
+import sourced.backend.api.EventsStorage
 import sourced.backend.metadata.StreamMetadata
 import sourced.backend.stream.EventStreamActor
 import sourced.client.api.exceptions.MetadataNotFoundForStreamType
@@ -17,9 +17,7 @@ import scala.collection._
 import scala.concurrent.Future
 import scala.util._
 
-class EmbeddedSourcedClientFactory(private val eventsStorage: EventsStorage, streamTypeToMetadata : Map[String,StreamMetadata]) extends SourcedClientFactory{
-
-  val actorSystem = ActorSystem("embedded-sourced")
+class EmbeddedSourcedClientFactory(private val actorSystem: ActorSystem, private val eventsStorage: EventsStorage, private val streamTypeToMetadata : Map[String,StreamMetadata]) extends SourcedClientFactory{
 
   implicit val executionContext = actorSystem.dispatcher
   implicit val defaultTimeout = Timeout(100,TimeUnit.MILLISECONDS)
@@ -35,7 +33,7 @@ class EmbeddedSourcedClientFactory(private val eventsStorage: EventsStorage, str
   override def streamClient(key: StreamKey): Try[StreamClient] = {
     streamTypeToMetadata.get(key.streamType)
       .map{ metadata =>
-      val actor = actorSystem.actorOf(Props(new EventStreamActor(key.id,metadata,eventsStorage)),name= "stream-" + key.toString)
+      val actor = actorSystem.actorOf(Props(new EventStreamActor(key.id,metadata,eventsStorage)),name= s"streams-${key.streamType}-${key.id}")
       Success(new EmbeddedStreamClient(actor))
     }
       .getOrElse(Failure(new MetadataNotFoundForStreamType(key.streamType)))

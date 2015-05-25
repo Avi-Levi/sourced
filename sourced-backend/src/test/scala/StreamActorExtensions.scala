@@ -1,7 +1,7 @@
 import akka.testkit.TestActorRef
 import sourced.backend.dispatchersIndex.TopicsToStreamHandlersIndex
 import sourced.backend.stream.EventStreamActor
-import testsClasses.TestHandler
+import sourced.testing.utils.TestHandler
 
 object StreamActorExtensions {
   implicit class ExtendedStreamActor(actor:TestActorRef[EventStreamActor]){

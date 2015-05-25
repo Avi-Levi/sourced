@@ -1,4 +1,4 @@
-package sourced.backend.events
+package sourced.backend.api
 
 import scala.concurrent.Future
 

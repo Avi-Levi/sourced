@@ -7,11 +7,11 @@ import akka.testkit.TestActorRef
 import akka.util.Timeout
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import sourced.backend.events.EventObject
+import sourced.backend.api.EventObject
 import sourced.backend.metadata.{HandlerMetadata, StreamMetadata}
 import sourced.backend.stream.EventStreamActor
 import sourced.messages.PushEvents
-import testsClasses.{TestEvent, TestEventsStorage, TestHandler}
+import sourced.testing.utils.{TestEvent, TestHandler, TestEventsStorage}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, _}

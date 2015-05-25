@@ -3,7 +3,7 @@ package sourced.mongodb.serialization
 import java.lang.reflect.Field
 
 import reactivemongo.bson.{BSONDocument, _}
-import sourced.backend.events.EventObject
+import sourced.backend.api.EventObject
 
 import scala.collection._
 

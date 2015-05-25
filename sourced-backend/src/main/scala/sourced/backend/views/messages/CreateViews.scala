@@ -1,8 +1,7 @@
 package sourced.backend.views.messages
 
 import java.util.UUID
-
-import sourced.backend.events.EventObject
+import sourced.backend.api.EventObject
 import sourced.backend.metadata.StreamMetadata
 import sourced.backend.views.ViewMetadata
 

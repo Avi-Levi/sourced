@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 
 class IntegrationTests extends FunSuite{
   val streamType: String = "test-stream"
-  test("works"){
+  test("e message is dispatched to handler"){
     val config = new EmbeddedSourcedConfiguration(new TestEventsStorage(List()))
     config.registerStream(StreamDefinition(streamType, Array(classOf[RegisteresAtDispatchRecorderHandler])))
     val clientFactory = config.newClientFactory()

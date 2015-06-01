@@ -28,29 +28,32 @@ class EventStreamActor(private val streamId: String,
   lazy val newEvents = ListBuffer[EventObject]()
 
   override def receive: Receive = {
-    case msg:PushEvents =>
-      if(loadStateFuture.isCompleted){
-        handlePushNewEvents(msg, sender())
-      }else{
-        val originalSender = sender()
-        loadStateFuture.onComplete{
-          case Success(_) => self ! PushNewEventsWithSender(msg,originalSender)
-          case Failure(t) => throw t
-        }
-      }
+    case msg:PushEvents => handlePushEvents(msg)
     case msg:PushNewEventsWithSender => handlePushNewEvents(msg.original, msg.sender)
+  }
+
+  private def handlePushEvents(msg: PushEvents): Unit = {
+    if (loadStateFuture.isCompleted) {
+      handlePushNewEvents(msg, sender())
+    } else {
+      val originalSender = sender()
+      loadStateFuture.onComplete {
+        case Success(_) => self ! PushNewEventsWithSender(msg, originalSender)
+        case Failure(t) => throw t
+      }
+    }
   }
 
   private def handlePushNewEvents(msg:PushEvents, sender:ActorRef)={
     this.push(msg.events)
 
-    if (!this.newEvents.isEmpty) {
+    if (this.newEvents.nonEmpty) {
 
       val saveFuture = this.eventsStorage.save(this.streamId, this.newEvents)
 
       saveFuture onComplete{
         case Success(_) =>
-          newEvents.clear
+          newEvents.clear()
           sender ! PushSuccess(msg.requestCorrelationKey)
         case Failure(t) =>
           sender ! PushFailure(msg.requestCorrelationKey)
@@ -59,7 +62,8 @@ class EventStreamActor(private val streamId: String,
       sender ! PushSuccess(msg.requestCorrelationKey)
     }
   }
-  def loadState : Future[Unit] = {
+
+  private def loadState : Future[Unit] = {
     val handlersInfo = streamMetadata.handlersMetadata.map(hm => HandlerInfo(hm.topicToMethodsMap,()=>createHandlerInstance(hm.handlerClass)))
     lazy val handlersIndex = new TopicsToStreamHandlersIndex(handlersInfo,streamMetadata.getEventMetadata)
 
@@ -70,11 +74,11 @@ class EventStreamActor(private val streamId: String,
     eventsStorage.iterate(streamId, handleEventLoaded).map(lastEventIndex => handleStateLoaded(lastEventIndex,handlersIndex))
   }
 
-
   private def handleStateLoaded(lastEventIndex:Long,handlersIndex: TopicsToHandlersIndex): Unit = {
     this.injectStreamRef(handlersIndex)
     this.handlersIndex = handlersIndex
   }
+
   private def injectStreamRef(handlersIndex: TopicsToHandlersIndex) = {
     val streamRef = new StreamRefImpl()
     handlersIndex.forEachInstance(_.asInstanceOf[EventsHandler].setStreamRef(streamRef))
@@ -88,6 +92,7 @@ class EventStreamActor(private val streamId: String,
   private def push(events: Array[AnyRef]) = {
     events.foreach(this.pushSingle)
   }
+
   private def pushSingle(msg: AnyRef): Unit = {
     val eventObj = EventObject(this.nextEventIndex, msg.getClass.getName, msg)
 
@@ -95,5 +100,4 @@ class EventStreamActor(private val streamId: String,
 
     this.handlersIndex.dispatch(msg)
   }
-
 }
